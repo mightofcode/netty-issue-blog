@@ -27,15 +27,17 @@ public class ActionHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
     private String fileToContentType(String path) {
 
         if (path.endsWith(".txt")) {
-            return "text/plain";
+            return "text/plain; charset=utf-8";
         } else if (path.endsWith(".html")) {
-            return "text/html";
+            return "text/html; charset=utf-8";
         } else if (path.endsWith(".png")) {
             return "image/png";
         } else if (path.endsWith(".jpg")) {
             return "image/jpeg";
+        } else if (path.endsWith(".css")) {
+            return "text/css; charset=utf-8";
         } else {
-            return "text/plain";
+            return "text/plain; charset=utf-8";
         }
     }
 

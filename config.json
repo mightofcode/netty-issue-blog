@@ -1,0 +1,6 @@
+{
+  "githubToken":"XXX",
+  "serverIp":"0.0.0.0",
+  "serverPort":9701,
+  "urlRoot":"http://www.yinwang.org/"
+}
