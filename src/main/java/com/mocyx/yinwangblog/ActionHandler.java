@@ -21,8 +21,23 @@ import java.nio.file.Paths;
  */
 @Slf4j
 public class ActionHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
-
     private String webRoot = "./webroot";
+
+
+    private String fileToContentType(String path) {
+
+        if (path.endsWith(".txt")) {
+            return "text/plain";
+        } else if (path.endsWith(".html")) {
+            return "text/html";
+        } else if (path.endsWith(".png")) {
+            return "image/png";
+        } else if (path.endsWith(".jpg")) {
+            return "image/jpeg";
+        } else {
+            return "text/plain";
+        }
+    }
 
     private byte[] readFile(String path) {
         String filePath = webRoot + path;
@@ -47,7 +62,6 @@ public class ActionHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
             log.error(e.getMessage(), e);
             throw new HttpException(HttpResponseStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR");
         }
-
     }
 
     @Override
@@ -56,24 +70,32 @@ public class ActionHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
 
         String path = queryString.path();
 
+        try {
+            log.info("ActionHandler {}", queryString);
+            byte[] data = readFile(path);
 
-        log.info("ActionHandler {}", queryString);
-        byte[] data = readFile(path);
+            ByteBuf buf = channelHandlerContext.alloc().buffer();
+            buf.writeBytes(data);
 
-        ByteBuf buf = channelHandlerContext.alloc().buffer();
-        buf.retain();
-        buf.writeBytes(data);
+            FullHttpResponse fullHttpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK,
+                    (buf));
+            fullHttpResponse.headers().add(HttpHeaderNames.CONTENT_TYPE, fileToContentType(path));
+            fullHttpResponse.headers().add(HttpHeaderNames.CONTENT_LENGTH, data.length);
 
+            channelHandlerContext.writeAndFlush(fullHttpResponse);
+        } catch (HttpException e) {
+            HttpResponseStatus status = e.code;
+            String html = String.format("<h1>%d</h1><p>%s</p>", status.code(), e.getMessage());
+            byte[] data = html.getBytes();
 
-        FullHttpResponse fullHttpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, HttpResponseStatus.OK,
-                (buf));
-        fullHttpResponse.headers().add(HttpHeaderNames.CONTENT_TYPE, "text/plain");
-        fullHttpResponse.headers().add(HttpHeaderNames.CONTENT_LENGTH, data.length);
-
-
-        channelHandlerContext.writeAndFlush(fullHttpResponse);
-        //Response response = Response.build(ctx, request);
-
+            ByteBuf buf = channelHandlerContext.alloc().buffer();
+            buf.writeBytes(data);
+            FullHttpResponse fullHttpResponse = new DefaultFullHttpResponse(HttpVersion.HTTP_1_1, status,
+                    buf);
+            fullHttpResponse.headers().add(HttpHeaderNames.CONTENT_TYPE, "text/html");
+            fullHttpResponse.headers().add(HttpHeaderNames.CONTENT_LENGTH, data.length);
+            channelHandlerContext.writeAndFlush(fullHttpResponse);
+        }
     }
 
     @Override
