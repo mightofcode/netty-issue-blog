@@ -8,9 +8,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  */
 @SpringBootApplication
 public class YinwangblogApplication {
-
     public static void main(String[] args) {
         SpringApplication.run(YinwangblogApplication.class, args);
     }
-
 }
+
+
+

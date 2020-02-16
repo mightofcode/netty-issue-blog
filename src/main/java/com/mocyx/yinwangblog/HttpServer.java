@@ -54,8 +54,8 @@ public class HttpServer implements Runnable {
 
                         }
                     });
-            Channel ch = b.bind(Config.serverIp, Config.serverPort).sync().channel();
-            log.info("http server started {} {}", Config.serverIp, Config.serverPort);
+            Channel ch = b.bind(Global.config.getServerIp(), Global.config.getServerPort()).sync().channel();
+            log.info("http server started {} {}", Global.config.getServerIp(), Global.config.getServerPort());
             ch.closeFuture().sync();
         } catch (Exception e) {
             log.error(e.getMessage(), e);

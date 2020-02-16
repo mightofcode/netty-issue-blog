@@ -21,7 +21,6 @@ import java.nio.file.Paths;
  */
 @Slf4j
 public class ActionHandler extends SimpleChannelInboundHandler<FullHttpRequest> {
-    private String webRoot = "./webroot";
 
 
     private String fileToContentType(String path) {
@@ -37,14 +36,14 @@ public class ActionHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
         } else if (path.endsWith(".css")) {
             return "text/css; charset=utf-8";
         } else {
-            return "text/plain; charset=utf-8";
+            return "text/html; charset=utf-8";
         }
     }
 
     private byte[] readFile(String path) {
-        String filePath = webRoot + path;
+        String filePath = Global.webRoot + path;
         Path p = Paths.get(filePath).toAbsolutePath();
-        Path pRoot = Paths.get(webRoot).toAbsolutePath();
+        Path pRoot = Paths.get(Global.webRoot).toAbsolutePath();
         if (!p.startsWith(pRoot)) {
             throw new HttpException(HttpResponseStatus.FORBIDDEN, "FORBIDDEN: " + path);
         }
@@ -71,6 +70,10 @@ public class ActionHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
         QueryStringDecoder queryString = new QueryStringDecoder(req.uri());
 
         String path = queryString.path();
+
+        if (path.endsWith("/")) {
+            path = "/index.html";
+        }
 
         try {
             log.info("ActionHandler {}", queryString);
