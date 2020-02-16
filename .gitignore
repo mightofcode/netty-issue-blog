@@ -1,6 +1,7 @@
 
 config-*.json
-
+webroot/blog-cn
+webroot/index.html
 # Compiled class file
 *.class
 
