@@ -1,6 +1,23 @@
 {
-  "githubToken":"XXX",
-  "serverIp":"0.0.0.0",
-  "serverPort":9701,
-  "urlRoot":"http://www.yinwang.org/"
+  "githubToken": "",
+  "serverIp": "0.0.0.0",
+  "serverPort": 9701,
+  "siteRoot": "http://127.0.0.1:9701",
+  "githubName": "mightofcode",
+  "githubRepo": "blog",
+  "blogName": "我没有在扯淡",
+  "links": [
+    {
+      "title": "微博",
+      "href": "https://www.baidu.com/"
+    },
+    {
+      "title": "付费",
+      "href": "https://www.baidu.com/"
+    },
+    {
+      "title": "联系",
+      "href": "https://www.baidu.com/"
+    }
+  ]
 }
