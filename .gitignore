@@ -4,7 +4,7 @@ webroot/blog-cn
 webroot/index.html
 # Compiled class file
 *.class
-
+data/webroot0
 # Log file
 *.log
 

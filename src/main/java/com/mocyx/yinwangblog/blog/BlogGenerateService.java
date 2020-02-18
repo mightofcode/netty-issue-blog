@@ -27,13 +27,13 @@ import java.util.TimeZone;
 @Slf4j
 public class BlogGenerateService {
 
-    private static String indexTpl = "template/index.html";
-    private static String blogTpl = "template/blog.html";
-    private static String articleItemTpl = "template/articleItem.html";
+    private static String indexTpl = "data/template/index.html";
+    private static String blogTpl = "data/template/blog.html";
+    private static String articleItemTpl = "data/template/articleItem.html";
 
 
     private String buildItems(IssuesDto issuesDto) throws Exception {
-        String articleItemTemplate = Util.readResouce(articleItemTpl);
+        String articleItemTemplate = Util.readFile(articleItemTpl);
 
         StringBuilder sb = new StringBuilder();
         for (IssueDto issueDto : issuesDto.getNodes()) {
@@ -78,7 +78,7 @@ public class BlogGenerateService {
 
     private void generateIndex(IssuesDto issuesDto) throws Exception {
         String articles = buildItems(issuesDto);
-        String indexTemplate = Util.readResouce(indexTpl);
+        String indexTemplate = Util.readFile(indexTpl);
         Map<String, String> reps = new HashMap<>();
         reps.put("#{blogTitle}", Global.config.getBlogName());
         reps.put("#{articles}", articles);
@@ -88,7 +88,7 @@ public class BlogGenerateService {
 
         String indexHtml = Util.templateReplace(indexTemplate, reps);
 
-        String filePath = Global.webRoot + "/index.html";
+        String filePath = Global.webRoot0 + "/index.html";
         Util.deleteFile(filePath);
         writeStringToFile(indexHtml, filePath);
     }
@@ -104,18 +104,16 @@ public class BlogGenerateService {
     private void generateArticle(IssuesDto issuesDto) throws Exception {
 
         for (IssueDto issueDto : issuesDto.getNodes()) {
-            String indexTemplate = Util.readResouce(blogTpl);
+            String indexTemplate = Util.readFile(blogTpl);
             Map<String, String> reps = new HashMap<>();
             reps.put("#{title}", issueDto.getTitle());
             reps.put("#{article}", issueDto.getBodyHTML());
             String html = Util.templateReplace(indexTemplate, reps);
 
-            String filePath = Global.webRoot + generateHref(issueDto);
+            String filePath = Global.webRoot0 + generateHref(issueDto);
             Util.deleteFile(filePath);
             writeStringToFile(html, filePath);
-
         }
-
 
     }
 

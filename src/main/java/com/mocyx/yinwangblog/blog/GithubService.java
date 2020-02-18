@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 public class GithubService {
     private final String queryStr = "{\n" +
             "  repository(owner: \"#{owner}\", name: \"#{name}\") {\n" +
-            "    issues(first: 100, orderBy: {field: CREATED_AT, direction: DESC}) {\n" +
+            "    issues(first: 100, orderBy: {field: CREATED_AT, direction: DESC},states: OPEN) {\n" +
             "      nodes {\n" +
             "        author {\n" +
             "          login\n" +
@@ -65,7 +65,7 @@ public class GithubService {
         OkHttpClient client = new OkHttpClient.Builder()
                 .connectTimeout(3000, TimeUnit.MILLISECONDS)
                 .writeTimeout(3000, TimeUnit.MILLISECONDS)
-                .readTimeout(3000, TimeUnit.MILLISECONDS)
+                .readTimeout(60000, TimeUnit.MILLISECONDS)
                 .build();
 
         MediaType jsonMedia = MediaType.parse("application/json; charset=utf-8");

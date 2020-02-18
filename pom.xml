@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.mocyx</groupId>
     <artifactId>yinwangblog</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0</version>
     <name>yinwangblog</name>
     <description>a blog looks like http://www.yinwang.org/, based on netty</description>
 

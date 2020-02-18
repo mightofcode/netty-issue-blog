@@ -39,28 +39,28 @@ public class ActionHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
         }
     }
 
+//
+//    private byte[] tryReadFromResource(String path) {
+//        try {
+//            String filePath = Global.resourceWebRoot + path;
+//            Path p = Paths.get(filePath).normalize();
+//            Path pRoot = Paths.get(Global.resourceWebRoot).normalize();
+//            if (!p.startsWith(pRoot)) {
+//                return null;
+//            }
+//            byte[] data = Util.readResouceAsBytes(filePath);
+//            return data;
+//        } catch (Exception e) {
+//            log.error(e.getMessage(), e);
+//            return null;
+//        }
+//
+//    }
 
-    private byte[] tryReadFromResource(String path) {
-        try {
-            String filePath = Global.resourceWebRoot + path;
-            Path p = Paths.get(filePath).normalize();
-            Path pRoot = Paths.get(Global.resourceWebRoot).normalize();
-            if (!p.startsWith(pRoot)) {
-                return null;
-            }
-            byte[] data = Util.readResouceAsBytes(filePath);
-            return data;
-        } catch (Exception e) {
-            log.error(e.getMessage(), e);
-            return null;
-        }
-
-    }
-
-    private byte[] readFile(String path) {
-        String filePath = Global.webRoot + path;
+    private byte[] readFile(String root, String path) {
+        String filePath = root + path;
         Path p = Paths.get(filePath).normalize();
-        Path pRoot = Paths.get(Global.webRoot).normalize();
+        Path pRoot = Paths.get(root).normalize();
         if (!p.startsWith(pRoot)) {
             return null;
         }
@@ -94,9 +94,9 @@ public class ActionHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
             log.info("ActionHandler {}", queryString);
 
             byte[] data = null;
-            data = readFile(path);
+            data = readFile(Global.webRoot, path);
             if (data == null) {
-                data = tryReadFromResource(path);
+                data = readFile(Global.webRoot0, path);
             }
             if (data == null) {
                 throw new HttpException(HttpResponseStatus.NOT_FOUND, path);
@@ -116,7 +116,7 @@ public class ActionHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
 
             byte[] data = null;
             if (status == HttpResponseStatus.NOT_FOUND) {
-                data = tryReadFromResource("./404.html");
+                data = readFile(Global.webRoot, "404.html");
             } else {
                 String html = String.format("<h1>%d</h1><p>%s</p>", status.code(), e.getMessage());
                 data = html.getBytes();

@@ -1,13 +1,11 @@
 package com.mocyx.yinwangblog;
 
-import java.util.concurrent.ConcurrentHashMap;
-
 public class Global {
     public static ConfigDto config;
     public static String gqlEndpoint = "https://api.github.com/graphql";
 
-    public static String resourceWebRoot = "./webroot/";
-    public static String webRoot = "./webroot/";
-    public static String blogRoot = "./webroot/blog-cn/";
+    public static String webRoot = "./data/webroot/";
+    public static String webRoot0 = "./data/webroot0/";
+    public static String blogRoot = "./data/webroot0/blog-cn/";
 
 }

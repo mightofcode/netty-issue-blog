@@ -6,7 +6,12 @@ import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.util.List;
 import java.util.Map;
+
+import org.springframework.util.ResourceUtils;
+
 
 @Slf4j
 public class Util {
@@ -26,37 +31,31 @@ public class Util {
             //log.error(e.getMessage(), e);
         }
     }
-
-    public static byte[] readResouceAsBytes(String path) {
-        try {
-            ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-            InputStream is = classloader.getResourceAsStream(path);
-            byte[] bytes = IOUtils.toByteArray(is);
-            is.close();
-            return bytes;
-        } catch (IOException e) {
-            return null;
-        }
-    }
-
-    public static String readResouce(String path) {
-        try {
-            ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-            InputStream is = classloader.getResourceAsStream(path);
-            InputStreamReader streamReader = new InputStreamReader(is, StandardCharsets.UTF_8);
-            BufferedReader reader = new BufferedReader(streamReader);
-
-            StringBuilder sb = new StringBuilder();
-            for (String line; (line = reader.readLine()) != null; ) {
-                sb.append(line);
-                sb.append("\n");
-            }
-            is.close();
-            return sb.toString();
-        } catch (IOException e) {
-            return null;
-        }
-    }
+//
+//    public static byte[] readResouceAsBytes(String path) {
+//        try {
+//            File file = ResourceUtils.getFile("classpath:" + path);
+//            return Files.readAllBytes(file.toPath());
+//        } catch (IOException e) {
+//            return null;
+//        }
+//    }
+//
+//    public static String readResouce(String path) {
+//        try {
+//
+//            File file = ResourceUtils.getFile("classpath:" + path);
+//            List<String> lines = Files.readAllLines(file.toPath(), StandardCharsets.UTF_8);
+//            StringBuilder sb = new StringBuilder();
+//            for (String line : lines) {
+//                sb.append(line);
+//                sb.append("\n");
+//            }
+//            return sb.toString();
+//        } catch (IOException e) {
+//            return null;
+//        }
+//    }
 
     public static String templateReplace(String template, Map<String, String> reps) {
         String res = template;
