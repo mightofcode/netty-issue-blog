@@ -1,6 +1,7 @@
-package com.mocyx.yinwangblog;
+package com.mocyx.yinwangblog.http;
 
 
+import com.mocyx.yinwangblog.Global;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelInitializer;

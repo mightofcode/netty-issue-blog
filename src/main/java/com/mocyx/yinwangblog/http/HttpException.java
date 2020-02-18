@@ -1,4 +1,4 @@
-package com.mocyx.yinwangblog;
+package com.mocyx.yinwangblog.http;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
 

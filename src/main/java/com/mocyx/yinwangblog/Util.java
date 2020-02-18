@@ -2,13 +2,14 @@ package com.mocyx.yinwangblog;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
 @Slf4j
-public class BlogUtil {
+public class Util {
 
     public static String readFile(String path) {
         try {
@@ -23,6 +24,18 @@ public class BlogUtil {
             FileUtils.forceDelete(new File(path));
         } catch (IOException e) {
             //log.error(e.getMessage(), e);
+        }
+    }
+
+    public static byte[] readResouceAsBytes(String path) {
+        try {
+            ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+            InputStream is = classloader.getResourceAsStream(path);
+            byte[] bytes = IOUtils.toByteArray(is);
+            is.close();
+            return bytes;
+        } catch (IOException e) {
+            return null;
         }
     }
 

@@ -1,13 +1,12 @@
-package com.mocyx.yinwangblog;
+package com.mocyx.yinwangblog.http;
 
+import com.mocyx.yinwangblog.Global;
+import com.mocyx.yinwangblog.Util;
+import com.mocyx.yinwangblog.http.HttpException;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.*;
-import io.netty.util.concurrent.Future;
-import io.netty.util.concurrent.GenericFutureListener;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 
@@ -40,28 +39,44 @@ public class ActionHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
         }
     }
 
+
+    private byte[] tryReadFromResource(String path) {
+        try {
+            String filePath = Global.resourceWebRoot + path;
+            Path p = Paths.get(filePath).normalize();
+            Path pRoot = Paths.get(Global.resourceWebRoot).normalize();
+            if (!p.startsWith(pRoot)) {
+                return null;
+            }
+            byte[] data = Util.readResouceAsBytes(filePath);
+            return data;
+        } catch (Exception e) {
+            log.error(e.getMessage(), e);
+            return null;
+        }
+
+    }
+
     private byte[] readFile(String path) {
         String filePath = Global.webRoot + path;
-        Path p = Paths.get(filePath).toAbsolutePath();
-        Path pRoot = Paths.get(Global.webRoot).toAbsolutePath();
+        Path p = Paths.get(filePath).normalize();
+        Path pRoot = Paths.get(Global.webRoot).normalize();
         if (!p.startsWith(pRoot)) {
-            throw new HttpException(HttpResponseStatus.FORBIDDEN, "FORBIDDEN: " + path);
+            return null;
         }
-
         File f = p.toFile();
         if (!f.exists()) {
-            throw new HttpException(HttpResponseStatus.NOT_FOUND, "NOT_FOUND: " + path);
+            return null;
         }
         if (f.isDirectory()) {
-            throw new HttpException(HttpResponseStatus.FORBIDDEN, "FORBIDDEN: " + path);
+            return null;
         }
-
         try {
             byte[] bytes = FileUtils.readFileToByteArray(f);
             return bytes;
         } catch (IOException e) {
             log.error(e.getMessage(), e);
-            throw new HttpException(HttpResponseStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR");
+            return null;
         }
     }
 
@@ -77,7 +92,15 @@ public class ActionHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
 
         try {
             log.info("ActionHandler {}", queryString);
-            byte[] data = readFile(path);
+
+            byte[] data = null;
+            data = readFile(path);
+            if (data == null) {
+                data = tryReadFromResource(path);
+            }
+            if (data == null) {
+                throw new HttpException(HttpResponseStatus.NOT_FOUND, path);
+            }
 
             ByteBuf buf = channelHandlerContext.alloc().buffer();
             buf.writeBytes(data);
@@ -90,8 +113,14 @@ public class ActionHandler extends SimpleChannelInboundHandler<FullHttpRequest> 
             channelHandlerContext.writeAndFlush(fullHttpResponse);
         } catch (HttpException e) {
             HttpResponseStatus status = e.code;
-            String html = String.format("<h1>%d</h1><p>%s</p>", status.code(), e.getMessage());
-            byte[] data = html.getBytes();
+
+            byte[] data = null;
+            if (status == HttpResponseStatus.NOT_FOUND) {
+                data = tryReadFromResource("./404.html");
+            } else {
+                String html = String.format("<h1>%d</h1><p>%s</p>", status.code(), e.getMessage());
+                data = html.getBytes();
+            }
 
             ByteBuf buf = channelHandlerContext.alloc().buffer();
             buf.writeBytes(data);

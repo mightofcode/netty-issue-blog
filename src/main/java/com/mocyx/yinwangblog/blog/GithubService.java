@@ -87,6 +87,7 @@ public class GithubService {
 
         String bodyString = IOUtils.toString(response.body().byteStream(), StandardCharsets.UTF_8);
 
+
         if (!response.isSuccessful()) {
             log.error("http fail {} {}", response.code(), bodyString);
             throw new BlogException("http error");

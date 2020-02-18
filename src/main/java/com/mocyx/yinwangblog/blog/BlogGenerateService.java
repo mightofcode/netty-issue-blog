@@ -1,12 +1,10 @@
 package com.mocyx.yinwangblog.blog;
 
-import com.mocyx.yinwangblog.BlogUtil;
-import com.mocyx.yinwangblog.ConfigDto;
+import com.mocyx.yinwangblog.Util;
 import com.mocyx.yinwangblog.Global;
 import com.mocyx.yinwangblog.blog.entity.LinkDto;
 import com.mocyx.yinwangblog.blog.entity.issue.IssueDto;
 import com.mocyx.yinwangblog.blog.entity.issue.IssuesDto;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.stereotype.Component;
@@ -16,7 +14,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,7 +33,7 @@ public class BlogGenerateService {
 
 
     private String buildItems(IssuesDto issuesDto) throws Exception {
-        String articleItemTemplate = BlogUtil.readResouce(articleItemTpl);
+        String articleItemTemplate = Util.readResouce(articleItemTpl);
 
         StringBuilder sb = new StringBuilder();
         for (IssueDto issueDto : issuesDto.getNodes()) {
@@ -49,8 +46,9 @@ public class BlogGenerateService {
             String href = generateHref(issueDto);
             reps.put("#{href}", href);
             reps.put("#{title}", issueDto.getTitle());
+            reps.put("#{siteRoot}", Global.config.getSiteRoot());
 
-            String s = BlogUtil.templateReplace(articleItemTemplate, reps);
+            String s = Util.templateReplace(articleItemTemplate, reps);
             sb.append(s);
         }
         return sb.toString();
@@ -74,14 +72,13 @@ public class BlogGenerateService {
         String res = "";
         for (LinkDto linkDto : Global.config.getLinks()) {
             res += String.format("<li><a href=\"%s\">%s</a></li>", linkDto.getHref(), linkDto.getTitle());
-
         }
         return res;
     }
 
     private void generateIndex(IssuesDto issuesDto) throws Exception {
         String articles = buildItems(issuesDto);
-        String indexTemplate = BlogUtil.readResouce(indexTpl);
+        String indexTemplate = Util.readResouce(indexTpl);
         Map<String, String> reps = new HashMap<>();
         reps.put("#{blogTitle}", Global.config.getBlogName());
         reps.put("#{articles}", articles);
@@ -89,10 +86,10 @@ public class BlogGenerateService {
 
         reps.put("#{links}", generateLinks());
 
-        String indexHtml = BlogUtil.templateReplace(indexTemplate, reps);
+        String indexHtml = Util.templateReplace(indexTemplate, reps);
 
         String filePath = Global.webRoot + "/index.html";
-        BlogUtil.deleteFile(filePath);
+        Util.deleteFile(filePath);
         writeStringToFile(indexHtml, filePath);
     }
 
@@ -107,14 +104,14 @@ public class BlogGenerateService {
     private void generateArticle(IssuesDto issuesDto) throws Exception {
 
         for (IssueDto issueDto : issuesDto.getNodes()) {
-            String indexTemplate = BlogUtil.readResouce(blogTpl);
+            String indexTemplate = Util.readResouce(blogTpl);
             Map<String, String> reps = new HashMap<>();
             reps.put("#{title}", issueDto.getTitle());
             reps.put("#{article}", issueDto.getBodyHTML());
-            String html = BlogUtil.templateReplace(indexTemplate, reps);
+            String html = Util.templateReplace(indexTemplate, reps);
 
             String filePath = Global.webRoot + generateHref(issueDto);
-            BlogUtil.deleteFile(filePath);
+            Util.deleteFile(filePath);
             writeStringToFile(html, filePath);
 
         }

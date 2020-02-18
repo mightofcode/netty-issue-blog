@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.mocyx.yinwangblog.blog.BlogGenerateService;
 import com.mocyx.yinwangblog.blog.GithubService;
 import com.mocyx.yinwangblog.blog.entity.issue.IssuesDto;
+import com.mocyx.yinwangblog.http.HttpServer;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,6 @@ import java.io.File;
 @Component
 @Slf4j
 public class Runner implements CommandLineRunner {
-
 
     @Autowired
     GithubService githubService;
@@ -35,11 +35,12 @@ public class Runner implements CommandLineRunner {
                     try {
                         IssuesDto issuesDto = githubService.getIssues();
                         blogGenerateService.generateBlog(issuesDto);
-                        log.info("github issues dumped");
+                        log.info("github issues copied");
                     } catch (Exception e) {
                         log.error(e.getMessage(), e);
                     }
                     try {
+                        //每分钟刷新一次
                         Thread.sleep(60 * 1000);
                     } catch (InterruptedException e) {
                         log.error(e.getMessage(), e);
@@ -64,7 +65,9 @@ public class Runner implements CommandLineRunner {
         String str = FileUtils.readFileToString(new File(configFile), "utf-8");
         ConfigDto configDto = JSON.parseObject(str, ConfigDto.class);
         Global.config = configDto;
+        //启动github更新线程
         startGithubDump();
+        //启动http
         Thread t = new Thread(new HttpServer());
         t.start();
         log.info("blog started");
